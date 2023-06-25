@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="robots" content="noindex, nofollow">
+		<link rel="icon" href="data:;base64,=">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			
+			* {
+				margin:0;
+				padding:0;
+				-webkit-user-select:none;
+				-moz-user-select:none;
+				-ms-user-select:none;
+			}
+			
+			body {
+				background:#000;
+				height:100dvh;
+				overflow:hidden;
+			}
+			
+			div {
+				font-family:Helvetica,sans-serif;
+				font-size:16px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<script>
+			(e=>{const t="function",n="isNode",r=document,o=(e,t)=>typeof e===t,i=(e,t)=>{null!==t&&(Array.isArray(t)?t.map(t=>i(e,t)):(a[n](t)||(t=r.createTextNode(t)),e.appendChild(t)))};function a(e,f){let l,d,s=arguments,c=1;if(e=a.isElement(e)?e:r.createElement(e),o(f,"object")&&!a[n](f)&&!Array.isArray(f))for(l in c++,f)d=f[l],l=a.attrMap[l]||l,o(l,t)?l(e,d):o(d,t)?e[l]=d:e.setAttribute(l,d);for(;c<s.length;c++)i(e,s[c]);return e}a.attrMap={},a.isElement=(e=>e instanceof Element),a[n]=(e=>e instanceof Node),a.proxy=new Proxy(a,{get:(e,t)=>(!(t in a)&&(a[t]=a.bind(null,t)),a[t])}),e(a,t)})((e,t)=>{"object"==typeof exports?module.exports=e:typeof define===t&&define.amd?define(e):this.crel=e});
+		</script>
+		<script src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lil-gui@0.17"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three":"https://unpkg.com/three@0.151.3/build/three.module.js",
+					"three/addons/":"https://unpkg.com/three@0.151.3/examples/jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			
+			import * as THREE from "three";
+			
+			
+			const width = 1920;
+			const height = 1080;
+			
+			let wrapper = crel("div");
+			Object.assign(wrapper.style,{width:width+"px",height:height+"px",position:"relative"});
+
+			const zoom = 0.9;
+			let div = crel("div");
+			Object.assign(div.style,{width:(100*zoom)+"%",height:(100*zoom)+"%",position:"absolute",top:"calc("+((100-(100*zoom))>>1)+"%)",left:"calc("+((100-(100*zoom))>>1)+"%)"});
+			crel(wrapper,div);
+			
+			let frame = crel("div");
+			frame.position = "relative";
+			div.appendChild(frame);
+			
+			let border = crel("div");
+			Object.assign(border.style,{width:"100%",height:"100%",position:"absolute",zIndex:64,top:"-1px",left:"-1px",border:"1px solid #444",pointerEvents:"none"});
+			crel(div,border);
+			
+			const container = crel("div");
+			Object.assign(container.style,{width:width+"px",height:height+"px",transformOrigin:"0 0",transform:"scale(1)"});
+			crel(div,container);
+			
+			const canvas = crel("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			Object.assign(canvas.style,{position:"absolute",zIndex:1024,width:width+"px",height:height+"px",transformOrigin:"0 0",verticalAlign:"top"});
+			crel(container,canvas);
+			const context = canvas.getContext("2d");
+			
+			const resize = function(e) {
+				if(window.innerWidth/width<window.innerHeight/height) {
+					const scale = (window.innerWidth/width)*zoom;
+					const h = window.innerWidth*(height/width)>>0;
+					container.style.transform = "scale("+scale+")";
+					Object.assign(wrapper.style,{
+						marginLeft:0,
+						width:"100dvw",
+						marginTop:((window.innerHeight-h)>>1)+"px",
+						height:h+"px"
+					});
+				}
+				else {
+					const scale = (window.innerHeight/height)*zoom;
+					const w = window.innerHeight*(width/height)>>0;
+					container.style.transform = "scale("+scale+")";
+					Object.assign(wrapper.style,{
+						marginLeft:((window.innerWidth-w)>>1)+"px",
+						width:w+"px",
+						marginTop:0,
+						height:"100dvh"
+					});
+				}
+			}
+			resize();
+			let tid = 0;
+			window.addEventListener("resize",(e)=>{
+				clearTimeout(tid);
+				tid = setTimeout(()=>resize(),15);
+			},false);
+			
+			crel(document.body,wrapper);
+			
+			const DOUBLE_SIDE = false;
+			
+			const camera = new THREE.PerspectiveCamera(60,width/height,0.1,1000.0);
+			camera.position.set(0,0,5);
+						
+			const scene = new THREE.Scene();
+			
+			const ambientLight = new THREE.AmbientLight(0xFFFFFF,1.0); 
+			scene.add(ambientLight);
+			
+			const renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setPixelRatio(1);
+			renderer.setSize(width,height,false);
+			renderer.setClearColor(0,0);
+			renderer.outputEncoding = THREE.sRGBEncoding;
+
+			crel(container,renderer.domElement);
+			
+			setInterval(function() {
+				renderer.render(scene,camera);
+			},33);
+			
+		</script>
+	</body>
+</html>
+					
